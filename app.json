@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Heavier",
-    "slug": "Heavier",
+    "slug": "heavier",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -43,6 +43,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7ec0c980-03db-4767-9c80-111f66868d37"
+      }
+    },
+    "owner": "shashivarun"
   }
 }
