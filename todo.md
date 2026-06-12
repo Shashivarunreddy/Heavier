@@ -47,4 +47,9 @@ This document maps out the proposed feature enhancements and technical improveme
 ## 6. Design & UX Refinements
 
 - [ ] **Workout Playlists Sync**: Control Spotify or Apple Music tracks directly within the active workout log dashboard.
-- [ ] **Custom Exercise Creator**: Enable adding custom exercises directly to the local catalog with photos and user guidelines.
+- [x] **Custom Exercise Creator**: Enable adding custom exercises directly to the local catalog with target muscles and instructions.
+- [ ] **Advanced Custom Exercises Features**:
+  - Add equipment tags (e.g., Barbell, Dumbbell, Cables, Machine, Kettlebell, Bodyweight).
+  - Enable custom workout categories creation (in addition to the static chest/back/legs/shoulders/arms/core).
+  - Add option to upload custom photos or attach tutorial links to user-defined exercises.
+  - Implement editing and deleting of created custom exercises.

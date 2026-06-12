@@ -30,6 +30,13 @@ This document details all implemented features, technical design, and rules for 
 - Clean post-workout summary detailing duration, total volume lifted, exercises completed, and achievements of new Personal Records (PRs).
 - Workout history browsing with search functionality and collapsible detail panels showing set breakdowns.
 
+### Custom Exercises & Variations Library
+- Merging of a comprehensive pre-defined exercise list with user-created custom variations.
+- Dynamic exercise selector search filtering through both standard and custom databases.
+- Direct inline "Create Custom" option available inside active workouts, template creations, and the main exercise library tab to prevent routine interruptions.
+- Offline storage of custom exercise definitions in SQLite database, persistent across app reloads.
+
+
 ### Measurements & Physique Timeline
 - Input checklist to log dimension indicators (Weight, Waist, Arms, Chest, Shoulders, Thighs, Neck).
 - Device image integration using `expo-image-picker` to save Front, Back, Left, and Right physique angles.

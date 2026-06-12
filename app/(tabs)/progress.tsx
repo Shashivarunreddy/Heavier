@@ -13,12 +13,12 @@ export default function Progress() {
   const { settings } = useUserStore();
 
   const [weight, setWeight] = useState("");
-  const [arm, setArm] = useState("");
   const [chest, setChest] = useState("");
   const [waist, setWaist] = useState("");
-  const [shoulder, setShoulder] = useState("");
-  const [thigh, setThigh] = useState("");
-  const [neck, setNeck] = useState("");
+  const [leftArm, setLeftArm] = useState("");
+  const [rightArm, setRightArm] = useState("");
+  const [leftThigh, setLeftThigh] = useState("");
+  const [rightThigh, setRightThigh] = useState("");
 
   const [photos, setPhotos] = useState<Partial<ProgressPhotos>>({
     front: null,
@@ -29,11 +29,28 @@ export default function Progress() {
 
   const [isLoggingOpen, setIsLoggingOpen] = useState(false);
 
-  const handlePickImage = async (angle: keyof ProgressPhotos) => {
-    // Request permissions
+  const handleLaunchCamera = async (angle: keyof ProgressPhotos) => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission Denied", "We need camera permissions to take photos.");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [3, 4],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setPhotos((prev) => ({ ...prev, [angle]: result.assets[0].uri }));
+    }
+  };
+
+  const handleLaunchLibrary = async (angle: keyof ProgressPhotos) => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert("Permission Denied", "We need camera roll permissions to select photos.");
+      Alert.alert("Permission Denied", "We need library permissions to select photos.");
       return;
     }
 
@@ -49,20 +66,41 @@ export default function Progress() {
     }
   };
 
+  const handlePickImage = (angle: keyof ProgressPhotos) => {
+    Alert.alert(
+      "Select Photo",
+      `How would you like to add the ${angle} view photo?`,
+      [
+        {
+          text: "Take Photo (Camera)",
+          onPress: () => handleLaunchCamera(angle),
+        },
+        {
+          text: "Choose from Gallery",
+          onPress: () => handleLaunchLibrary(angle),
+        },
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+      ]
+    );
+  };
+
   const handleSaveMeasurement = async () => {
-    if (!weight && !arm && !chest && !waist && !shoulder && !thigh && !neck) {
+    if (!weight && !chest && !waist && !leftArm && !rightArm && !leftThigh && !rightThigh) {
       Alert.alert("Validation Error", "Please enter at least one measurement metric.");
       return;
     }
 
     const metrics = {
       bodyWeight: weight ? parseFloat(weight) : undefined,
-      armSize: arm ? parseFloat(arm) : undefined,
       chestSize: chest ? parseFloat(chest) : undefined,
       waistSize: waist ? parseFloat(waist) : undefined,
-      thighSize: thigh ? parseFloat(thigh) : undefined,
-      shoulderSize: shoulder ? parseFloat(shoulder) : undefined,
-      neckSize: neck ? parseFloat(neck) : undefined,
+      leftArmSize: leftArm ? parseFloat(leftArm) : undefined,
+      rightArmSize: rightArm ? parseFloat(rightArm) : undefined,
+      leftThighSize: leftThigh ? parseFloat(leftThigh) : undefined,
+      rightThighSize: rightThigh ? parseFloat(rightThigh) : undefined,
     };
 
     const date = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
@@ -72,12 +110,12 @@ export default function Progress() {
       
       // Reset Form
       setWeight("");
-      setArm("");
       setChest("");
       setWaist("");
-      setShoulder("");
-      setThigh("");
-      setNeck("");
+      setLeftArm("");
+      setRightArm("");
+      setLeftThigh("");
+      setRightThigh("");
       setPhotos({ front: null, left: null, right: null, back: null });
       setIsLoggingOpen(false);
       Alert.alert("Success", "Progress check-in logged successfully!");
@@ -157,32 +195,6 @@ export default function Progress() {
               </View>
 
               <View className="flex-1">
-                <Text className="text-zinc-500 text-[10px] font-black uppercase tracking-wider mb-2">Waist ({settings.lengthUnit})</Text>
-                <TextInput
-                  value={waist}
-                  onChangeText={setWaist}
-                  keyboardType="numeric"
-                  placeholder="e.g. 82.0"
-                  placeholderTextColor="#3f3f46"
-                  className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 text-zinc-900 dark:text-white px-3 py-2.5 rounded-xl font-bold text-xs focus:border-emerald-500"
-                />
-              </View>
-            </View>
-
-            <View className="flex-row gap-4">
-              <View className="flex-1">
-                <Text className="text-zinc-500 text-[10px] font-black uppercase tracking-wider mb-2">Arm ({settings.lengthUnit})</Text>
-                <TextInput
-                  value={arm}
-                  onChangeText={setArm}
-                  keyboardType="numeric"
-                  placeholder="e.g. 36.5"
-                  placeholderTextColor="#3f3f46"
-                  className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 text-zinc-900 dark:text-white px-3 py-2.5 rounded-xl font-bold text-xs focus:border-emerald-500"
-                />
-              </View>
-
-              <View className="flex-1">
                 <Text className="text-zinc-500 text-[10px] font-black uppercase tracking-wider mb-2">Chest ({settings.lengthUnit})</Text>
                 <TextInput
                   value={chest}
@@ -197,40 +209,69 @@ export default function Progress() {
 
             <View className="flex-row gap-4">
               <View className="flex-1">
-                <Text className="text-zinc-500 text-[10px] font-black uppercase tracking-wider mb-2">Shoulders ({settings.lengthUnit})</Text>
+                <Text className="text-zinc-500 text-[10px] font-black uppercase tracking-wider mb-2">Waist ({settings.lengthUnit})</Text>
                 <TextInput
-                  value={shoulder}
-                  onChangeText={setShoulder}
+                  value={waist}
+                  onChangeText={setWaist}
                   keyboardType="numeric"
-                  placeholder="e.g. 118"
+                  placeholder="e.g. 82.0"
+                  placeholderTextColor="#3f3f46"
+                  className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 text-zinc-900 dark:text-white px-3 py-2.5 rounded-xl font-bold text-xs focus:border-emerald-500"
+                />
+              </View>
+              <View className="flex-1" />
+            </View>
+
+            <View className="flex-row gap-4">
+              <View className="flex-1">
+                <Text className="text-zinc-500 text-[10px] font-black uppercase tracking-wider mb-2">Left Arm ({settings.lengthUnit})</Text>
+                <TextInput
+                  value={leftArm}
+                  onChangeText={setLeftArm}
+                  keyboardType="numeric"
+                  placeholder="e.g. 36.5"
                   placeholderTextColor="#3f3f46"
                   className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 text-zinc-900 dark:text-white px-3 py-2.5 rounded-xl font-bold text-xs focus:border-emerald-500"
                 />
               </View>
 
               <View className="flex-1">
-                <Text className="text-zinc-500 text-[10px] font-black uppercase tracking-wider mb-2">Thigh ({settings.lengthUnit})</Text>
+                <Text className="text-zinc-500 text-[10px] font-black uppercase tracking-wider mb-2">Right Arm ({settings.lengthUnit})</Text>
                 <TextInput
-                  value={thigh}
-                  onChangeText={setThigh}
+                  value={rightArm}
+                  onChangeText={setRightArm}
                   keyboardType="numeric"
-                  placeholder="e.g. 58"
+                  placeholder="e.g. 36.7"
                   placeholderTextColor="#3f3f46"
                   className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 text-zinc-900 dark:text-white px-3 py-2.5 rounded-xl font-bold text-xs focus:border-emerald-500"
                 />
               </View>
             </View>
 
-            <View className="w-[50%] pr-2">
-              <Text className="text-zinc-500 text-[10px] font-black uppercase tracking-wider mb-2">Neck ({settings.lengthUnit})</Text>
-              <TextInput
-                value={neck}
-                onChangeText={setNeck}
-                keyboardType="numeric"
-                placeholder="e.g. 38.5"
-                placeholderTextColor="#3f3f46"
-                className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 text-zinc-900 dark:text-white px-3 py-2.5 rounded-xl font-bold text-xs focus:border-emerald-500"
-              />
+            <View className="flex-row gap-4">
+              <View className="flex-1">
+                <Text className="text-zinc-500 text-[10px] font-black uppercase tracking-wider mb-2">Left Thigh ({settings.lengthUnit})</Text>
+                <TextInput
+                  value={leftThigh}
+                  onChangeText={setLeftThigh}
+                  keyboardType="numeric"
+                  placeholder="e.g. 58"
+                  placeholderTextColor="#3f3f46"
+                  className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 text-zinc-900 dark:text-white px-3 py-2.5 rounded-xl font-bold text-xs focus:border-emerald-500"
+                />
+              </View>
+
+              <View className="flex-1">
+                <Text className="text-zinc-500 text-[10px] font-black uppercase tracking-wider mb-2">Right Thigh ({settings.lengthUnit})</Text>
+                <TextInput
+                  value={rightThigh}
+                  onChangeText={setRightThigh}
+                  keyboardType="numeric"
+                  placeholder="e.g. 58.2"
+                  placeholderTextColor="#3f3f46"
+                  className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 text-zinc-900 dark:text-white px-3 py-2.5 rounded-xl font-bold text-xs focus:border-emerald-500"
+                />
+              </View>
             </View>
 
             {/* Photo Selection Grid */}
@@ -305,6 +346,13 @@ export default function Progress() {
                         <Text className="text-zinc-900 dark:text-white text-xs font-black">{item.bodyWeight} {settings.weightUnit}</Text>
                       </View>
                     ) : null}
+
+                    {item.chestSize ? (
+                      <View className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/60 px-3 py-1.5 rounded-xl">
+                        <Text className="text-zinc-500 text-[8px] font-bold uppercase tracking-wider mb-0.5">Chest</Text>
+                        <Text className="text-zinc-900 dark:text-white text-xs font-black">{item.chestSize} {settings.lengthUnit}</Text>
+                      </View>
+                    ) : null}
                     
                     {item.waistSize ? (
                       <View className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/60 px-3 py-1.5 rounded-xl">
@@ -313,17 +361,31 @@ export default function Progress() {
                       </View>
                     ) : null}
 
-                    {item.armSize ? (
+                    {item.leftArmSize ? (
                       <View className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/60 px-3 py-1.5 rounded-xl">
-                        <Text className="text-zinc-500 text-[8px] font-bold uppercase tracking-wider mb-0.5">Arm</Text>
-                        <Text className="text-zinc-900 dark:text-white text-xs font-black">{item.armSize} {settings.lengthUnit}</Text>
+                        <Text className="text-zinc-500 text-[8px] font-bold uppercase tracking-wider mb-0.5">L Arm</Text>
+                        <Text className="text-zinc-900 dark:text-white text-xs font-black">{item.leftArmSize} {settings.lengthUnit}</Text>
                       </View>
                     ) : null}
 
-                    {item.chestSize ? (
+                    {item.rightArmSize ? (
                       <View className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/60 px-3 py-1.5 rounded-xl">
-                        <Text className="text-zinc-500 text-[8px] font-bold uppercase tracking-wider mb-0.5">Chest</Text>
-                        <Text className="text-zinc-900 dark:text-white text-xs font-black">{item.chestSize} {settings.lengthUnit}</Text>
+                        <Text className="text-zinc-500 text-[8px] font-bold uppercase tracking-wider mb-0.5">R Arm</Text>
+                        <Text className="text-zinc-900 dark:text-white text-xs font-black">{item.rightArmSize} {settings.lengthUnit}</Text>
+                      </View>
+                    ) : null}
+
+                    {item.leftThighSize ? (
+                      <View className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/60 px-3 py-1.5 rounded-xl">
+                        <Text className="text-zinc-500 text-[8px] font-bold uppercase tracking-wider mb-0.5">L Thigh</Text>
+                        <Text className="text-zinc-900 dark:text-white text-xs font-black">{item.leftThighSize} {settings.lengthUnit}</Text>
+                      </View>
+                    ) : null}
+
+                    {item.rightThighSize ? (
+                      <View className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/60 px-3 py-1.5 rounded-xl">
+                        <Text className="text-zinc-500 text-[8px] font-bold uppercase tracking-wider mb-0.5">R Thigh</Text>
+                        <Text className="text-zinc-900 dark:text-white text-xs font-black">{item.rightThighSize} {settings.lengthUnit}</Text>
                       </View>
                     ) : null}
                   </View>

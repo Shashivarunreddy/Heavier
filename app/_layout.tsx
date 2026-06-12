@@ -31,7 +31,7 @@ const DARK_THEME = {
 export default function RootLayout() {
   const { isDarkColorScheme, setColorScheme } = useColorScheme();
   const { loadUser, settings, isLoading } = useUserStore();
-  const { loadTemplates, loadWorkoutHistory } = useWorkoutStore();
+  const { loadTemplates, loadWorkoutHistory, loadCustomExercises } = useWorkoutStore();
   const { loadMeasurements } = useMeasurementStore();
 
   useEffect(() => {
@@ -42,8 +42,9 @@ export default function RootLayout() {
     loadUser();
     loadTemplates();
     loadWorkoutHistory();
+    loadCustomExercises();
     loadMeasurements();
-  }, [loadUser, loadTemplates, loadWorkoutHistory, loadMeasurements]);
+  }, [loadUser, loadTemplates, loadWorkoutHistory, loadCustomExercises, loadMeasurements]);
 
   useEffect(() => {
     if (!isLoading) {

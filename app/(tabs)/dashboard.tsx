@@ -64,7 +64,7 @@ export default function Dashboard() {
   const previousLog = measurements[1] || null;
 
   const weightVal = latestLog?.bodyWeight ? `${latestLog.bodyWeight} ${settings.weightUnit}` : "--";
-  const armVal = latestLog?.armSize ? `${latestLog.armSize} ${settings.lengthUnit}` : "--";
+  const lArmVal = latestLog?.leftArmSize ? `${latestLog.leftArmSize} ${settings.lengthUnit}` : "--";
   const waistVal = latestLog?.waistSize ? `${latestLog.waistSize} ${settings.lengthUnit}` : "--";
 
   // Calculate progress differences
@@ -83,8 +83,11 @@ export default function Dashboard() {
   };
 
   const weightDiff = getDiffText(latestLog?.bodyWeight, previousLog?.bodyWeight, settings.weightUnit, true);
-  const armDiff = getDiffText(latestLog?.armSize, previousLog?.armSize, settings.lengthUnit);
+  const lArmDiff = getDiffText(latestLog?.leftArmSize, previousLog?.leftArmSize, settings.lengthUnit);
+  const rArmDiff = getDiffText(latestLog?.rightArmSize, previousLog?.rightArmSize, settings.lengthUnit);
   const waistDiff = getDiffText(latestLog?.waistSize, previousLog?.waistSize, settings.lengthUnit, true);
+  const lThighDiff = getDiffText(latestLog?.leftThighSize, previousLog?.leftThighSize, settings.lengthUnit);
+  const rThighDiff = getDiffText(latestLog?.rightThighSize, previousLog?.rightThighSize, settings.lengthUnit);
 
   const recentWorkout = workoutHistory[0] || null;
 
@@ -129,8 +132,8 @@ export default function Dashboard() {
             </View>
             <View className="w-[1px] bg-zinc-800 h-8 self-center" />
             <View className="items-center flex-1">
-              <Text className="text-zinc-500 text-xs font-semibold uppercase tracking-wider mb-1">Arms</Text>
-              <Text className="text-zinc-900 dark:text-white text-lg font-bold">{armVal}</Text>
+              <Text className="text-zinc-500 text-xs font-semibold uppercase tracking-wider mb-1">L Arm</Text>
+              <Text className="text-zinc-900 dark:text-white text-lg font-bold">{lArmVal}</Text>
             </View>
             <View className="w-[1px] bg-zinc-800 h-8 self-center" />
             <View className="items-center flex-1">
@@ -207,16 +210,28 @@ export default function Dashboard() {
           <Text className="text-zinc-500 text-xs font-semibold uppercase tracking-wider mb-3">Progress since last check-in</Text>
           <View className="bg-white dark:bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 rounded-3xl p-5">
             <View className="flex-row justify-between items-center py-2 border-b border-zinc-200 dark:border-zinc-800 dark:border-zinc-800/40">
-              <Text className="text-zinc-600 dark:text-zinc-400 dark:text-zinc-400 text-sm font-medium">Weight Change</Text>
+              <Text className="text-zinc-600 dark:text-zinc-400 dark:text-zinc-400 text-sm font-medium">Weight</Text>
               <Text className={weightDiff.color}>{weightDiff.text}</Text>
             </View>
             <View className="flex-row justify-between items-center py-2 border-b border-zinc-200 dark:border-zinc-800 dark:border-zinc-800/40">
-              <Text className="text-zinc-600 dark:text-zinc-400 dark:text-zinc-400 text-sm font-medium">Arm Size</Text>
-              <Text className={armDiff.color}>{armDiff.text}</Text>
+              <Text className="text-zinc-600 dark:text-zinc-400 dark:text-zinc-400 text-sm font-medium">Waist</Text>
+              <Text className={waistDiff.color}>{waistDiff.text}</Text>
+            </View>
+            <View className="flex-row justify-between items-center py-2 border-b border-zinc-200 dark:border-zinc-800 dark:border-zinc-800/40">
+              <Text className="text-zinc-600 dark:text-zinc-400 dark:text-zinc-400 text-sm font-medium">Left Arm</Text>
+              <Text className={lArmDiff.color}>{lArmDiff.text}</Text>
+            </View>
+            <View className="flex-row justify-between items-center py-2 border-b border-zinc-200 dark:border-zinc-800 dark:border-zinc-800/40">
+              <Text className="text-zinc-600 dark:text-zinc-400 dark:text-zinc-400 text-sm font-medium">Right Arm</Text>
+              <Text className={rArmDiff.color}>{rArmDiff.text}</Text>
+            </View>
+            <View className="flex-row justify-between items-center py-2 border-b border-zinc-200 dark:border-zinc-800 dark:border-zinc-800/40">
+              <Text className="text-zinc-600 dark:text-zinc-400 dark:text-zinc-400 text-sm font-medium">Left Thigh</Text>
+              <Text className={lThighDiff.color}>{lThighDiff.text}</Text>
             </View>
             <View className="flex-row justify-between items-center py-2">
-              <Text className="text-zinc-600 dark:text-zinc-400 dark:text-zinc-400 text-sm font-medium">Waist Size</Text>
-              <Text className={waistDiff.color}>{waistDiff.text}</Text>
+              <Text className="text-zinc-600 dark:text-zinc-400 dark:text-zinc-400 text-sm font-medium">Right Thigh</Text>
+              <Text className={rThighDiff.color}>{rThighDiff.text}</Text>
             </View>
           </View>
         </View>

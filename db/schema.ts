@@ -52,12 +52,12 @@ export const measurements = sqliteTable("measurements", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   measurementDate: text("measurement_date").notNull(),
   bodyWeight: real("body_weight"),
-  armSize: real("arm_size"),
   chestSize: real("chest_size"),
   waistSize: real("waist_size"),
-  thighSize: real("thigh_size"),
-  shoulderSize: real("shoulder_size"),
-  neckSize: real("neck_size"),
+  leftArmSize: real("left_arm_size"),
+  rightArmSize: real("right_arm_size"),
+  leftThighSize: real("left_thigh_size"),
+  rightThighSize: real("right_thigh_size"),
   createdAt: text("created_at").notNull(),
 });
 
@@ -71,3 +71,13 @@ export const progressPhotos = sqliteTable("progress_photos", {
   backImagePath: text("back_image_path"),
   createdAt: text("created_at").notNull(),
 });
+
+export const customExercises = sqliteTable("custom_exercises", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull().unique(),
+  category: text("category").notNull(),
+  targetMuscle: text("target_muscle"),
+  instructions: text("instructions"),
+  createdAt: text("created_at").notNull(),
+});
+

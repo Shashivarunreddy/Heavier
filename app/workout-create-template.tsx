@@ -15,7 +15,7 @@ interface SelectedExercise {
 
 export default function WorkoutCreateTemplate() {
   const router = useRouter();
-  const createTemplate = useWorkoutStore((state) => state.createTemplate);
+  const { createTemplate, customExercises, createCustomExercise } = useWorkoutStore();
 
   const [name, setName] = useState("");
   const [notes, setNotes] = useState("");
@@ -23,6 +23,44 @@ export default function WorkoutCreateTemplate() {
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Custom exercise creation state
+  type WorkoutCategory = "Chest" | "Back" | "Legs" | "Shoulders" | "Arms" | "Core";
+  const creationCategories: WorkoutCategory[] = ["Chest", "Back", "Legs", "Shoulders", "Arms", "Core"];
+  
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [newExerciseName, setNewExerciseName] = useState("");
+  const [newExerciseCategory, setNewExerciseCategory] = useState<WorkoutCategory>("Chest");
+  const [newExerciseTarget, setNewExerciseTarget] = useState("");
+  const [newExerciseInstructions, setNewExerciseInstructions] = useState("");
+
+  const handleCreateExercise = async () => {
+    if (!newExerciseName.trim()) {
+      Alert.alert("Required", "Please enter an exercise name.");
+      return;
+    }
+
+    const success = await createCustomExercise(
+      newExerciseName,
+      newExerciseCategory,
+      newExerciseTarget,
+      newExerciseInstructions
+    );
+
+    if (success) {
+      const createdName = newExerciseName.trim();
+      setNewExerciseName("");
+      setNewExerciseCategory("Chest");
+      setNewExerciseTarget("");
+      setNewExerciseInstructions("");
+      setIsCreateModalOpen(false);
+      
+      // Auto-select the newly created exercise
+      handleAddExerciseFromLibrary(createdName);
+    } else {
+      Alert.alert("Duplicate Name", "An exercise with this name already exists in the library.");
+    }
+  };
 
   const handleAddExerciseFromLibrary = (exerciseName: string) => {
     // Avoid double adding
@@ -94,8 +132,11 @@ export default function WorkoutCreateTemplate() {
     }
   };
 
-  // Filter exercise library
-  const filteredLibrary = EXERCISE_LIBRARY.filter((e) =>
+  // Filter exercise library (static + custom)
+  const combinedLibrary = [...EXERCISE_LIBRARY, ...customExercises];
+  const sortedLibrary = [...combinedLibrary].sort((a, b) => a.name.localeCompare(b.name));
+
+  const filteredLibrary = sortedLibrary.filter((e) =>
     e.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     e.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -253,6 +294,18 @@ export default function WorkoutCreateTemplate() {
             </View>
           </View>
 
+          {/* Not finding it? Create Custom banner */}
+          <View className="px-6 pb-3 flex-row justify-between items-center">
+            <Text className="text-zinc-500 text-[10px] font-bold uppercase tracking-wider">Not finding it?</Text>
+            <Pressable
+              onPress={() => setIsCreateModalOpen(true)}
+              className="flex-row items-center bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-3 py-1.5 rounded-xl active:scale-95"
+            >
+              <Ionicons name="add" size={14} color="#10b981" className="mr-1" />
+              <Text className="text-emerald-400 text-xs font-bold uppercase tracking-wider">Create Custom</Text>
+            </Pressable>
+          </View>
+
           <ScrollView className="flex-grow px-6">
             <View className="gap-2.5 pb-8">
               {filteredLibrary.map((item, idx) => (
@@ -273,6 +326,102 @@ export default function WorkoutCreateTemplate() {
             </View>
           </ScrollView>
         </SafeAreaView>
+      </Modal>
+
+      {/* Create Custom Exercise Modal */}
+      <Modal
+        visible={isCreateModalOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setIsCreateModalOpen(false)}
+      >
+        <View className="flex-1 justify-center items-center bg-black/70 px-6">
+          <View className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 rounded-3xl p-6 w-full max-w-sm">
+            <View className="flex-row justify-between items-center mb-4">
+              <Text className="text-zinc-900 dark:text-white text-base font-black tracking-tight">Create Custom Exercise</Text>
+              <Pressable
+                onPress={() => setIsCreateModalOpen(false)}
+                className="w-8 h-8 rounded-lg bg-zinc-50 dark:bg-zinc-950 justify-center items-center"
+              >
+                <Ionicons name="close" size={16} color="#ffffff" />
+              </Pressable>
+            </View>
+
+            <ScrollView className="max-h-[350px]" showsVerticalScrollIndicator={false}>
+              <View className="gap-4 pb-2">
+                <View>
+                  <Text className="text-zinc-500 text-[10px] font-black uppercase tracking-wider mb-1.5">Exercise Name *</Text>
+                  <TextInput
+                    value={newExerciseName}
+                    onChangeText={setNewExerciseName}
+                    placeholder="e.g. Incline Bench Press (Barbell)"
+                    placeholderTextColor="#71717a"
+                    className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/60 text-zinc-900 dark:text-white px-3 py-2.5 rounded-xl text-xs font-semibold"
+                  />
+                </View>
+
+                <View>
+                  <Text className="text-zinc-500 text-[10px] font-black uppercase tracking-wider mb-1.5">Category *</Text>
+                  <View className="flex-row flex-wrap gap-1.5">
+                    {creationCategories.map((cat) => {
+                      const isSel = newExerciseCategory === cat;
+                      return (
+                        <Pressable
+                          key={cat}
+                          onPress={() => setNewExerciseCategory(cat)}
+                          className={`px-3 py-1.5 rounded-lg border text-center active:scale-95 transition-all ${
+                            isSel
+                              ? "bg-emerald-500 border-emerald-500"
+                              : "bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800/60"
+                          }`}
+                        >
+                          <Text
+                            className={`text-[10px] font-bold ${
+                              isSel ? "text-zinc-950" : "text-zinc-600 dark:text-zinc-400"
+                            }`}
+                          >
+                            {cat}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                </View>
+
+                <View>
+                  <Text className="text-zinc-500 text-[10px] font-black uppercase tracking-wider mb-1.5">Target Muscles</Text>
+                  <TextInput
+                    value={newExerciseTarget}
+                    onChangeText={setNewExerciseTarget}
+                    placeholder="e.g. Upper Chest, Triceps"
+                    placeholderTextColor="#71717a"
+                    className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/60 text-zinc-900 dark:text-white px-3 py-2.5 rounded-xl text-xs font-semibold"
+                  />
+                </View>
+
+                <View>
+                  <Text className="text-zinc-500 text-[10px] font-black uppercase tracking-wider mb-1.5">Instructions</Text>
+                  <TextInput
+                    value={newExerciseInstructions}
+                    onChangeText={setNewExerciseInstructions}
+                    placeholder="e.g. Set bench to 30 degrees..."
+                    placeholderTextColor="#71717a"
+                    multiline
+                    numberOfLines={3}
+                    className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/60 text-zinc-900 dark:text-white px-3 py-2.5 rounded-xl text-xs font-semibold leading-relaxed"
+                  />
+                </View>
+              </View>
+            </ScrollView>
+
+            <Pressable
+              onPress={handleCreateExercise}
+              className="bg-emerald-500 py-3 rounded-xl items-center mt-6 active:scale-95"
+            >
+              <Text className="text-zinc-950 text-xs font-black uppercase tracking-wider">Save Exercise</Text>
+            </Pressable>
+          </View>
+        </View>
       </Modal>
     </SafeAreaView>
   );

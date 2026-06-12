@@ -118,12 +118,12 @@ export default function ProgressCompare() {
               <Text className="text-zinc-500 text-xs font-semibold uppercase tracking-wider mb-3">Measurement Deltas</Text>
               
               {renderComparisonRow("Weight", entryA.bodyWeight, entryB.bodyWeight, settings.weightUnit)}
-              {renderComparisonRow("Waist", entryA.waistSize, entryB.waistSize, settings.lengthUnit)}
-              {renderComparisonRow("Arm", entryA.armSize, entryB.armSize, settings.lengthUnit)}
               {renderComparisonRow("Chest", entryA.chestSize, entryB.chestSize, settings.lengthUnit)}
-              {renderComparisonRow("Shoulders", entryA.shoulderSize, entryB.shoulderSize, settings.lengthUnit)}
-              {renderComparisonRow("Thigh", entryA.thighSize, entryB.thighSize, settings.lengthUnit)}
-              {renderComparisonRow("Neck", entryA.neckSize, entryB.neckSize, settings.lengthUnit)}
+              {renderComparisonRow("Waist", entryA.waistSize, entryB.waistSize, settings.lengthUnit)}
+              {renderComparisonRow("Left Arm", entryA.leftArmSize, entryB.leftArmSize, settings.lengthUnit)}
+              {renderComparisonRow("Right Arm", entryA.rightArmSize, entryB.rightArmSize, settings.lengthUnit)}
+              {renderComparisonRow("Left Thigh", entryA.leftThighSize, entryB.leftThighSize, settings.lengthUnit)}
+              {renderComparisonRow("Right Thigh", entryA.rightThighSize, entryB.rightThighSize, settings.lengthUnit)}
             </View>
 
             {/* Photos Side-by-Side */}

@@ -1,5 +1,15 @@
 import { create } from "zustand";
 import { sqliteDb } from "@/db/sqlite";
+import { ExerciseInfo, EXERCISE_LIBRARY } from "@/lib/exerciseLibrary";
+
+interface DBCustomExerciseRow {
+  id: number;
+  name: string;
+  category: string;
+  target_muscle: string | null;
+  instructions: string | null;
+  created_at: string;
+}
 
 interface DBTemplateRow {
   id: number;
@@ -96,6 +106,7 @@ interface WorkoutState {
   templates: WorkoutTemplate[];
   activeWorkout: ActiveWorkout | null;
   workoutHistory: WorkoutHistoryEntry[];
+  customExercises: ExerciseInfo[];
   isLoading: boolean;
 
   loadTemplates: () => Promise<void>;
@@ -113,12 +124,21 @@ interface WorkoutState {
 
   loadWorkoutHistory: () => Promise<void>;
   deleteWorkoutFromHistory: (id: number) => Promise<void>;
+
+  loadCustomExercises: () => Promise<void>;
+  createCustomExercise: (
+    name: string,
+    category: "Chest" | "Back" | "Legs" | "Shoulders" | "Arms" | "Core",
+    targetMuscle?: string,
+    instructions?: string
+  ) => Promise<boolean>;
 }
 
 export const useWorkoutStore = create<WorkoutState>((set, get) => ({
   templates: [],
   activeWorkout: null,
   workoutHistory: [],
+  customExercises: [],
   isLoading: false,
 
   loadTemplates: async () => {
@@ -192,6 +212,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       await get().loadTemplates();
     } catch (e) {
       console.error("Failed to create template:", e);
+      throw e;
     }
   },
 
@@ -410,7 +431,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       return history.find((h) => h.id === workoutId) || null;
     } catch (e) {
       console.error("Failed to finish active workout:", e);
-      return null;
+      throw e;
     }
   },
 
@@ -473,6 +494,59 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       await get().loadWorkoutHistory();
     } catch (e) {
       console.error("Failed to delete workout history entry:", e);
+    }
+  },
+
+  loadCustomExercises: async () => {
+    try {
+      const rows = sqliteDb.getAllSync("SELECT * FROM custom_exercises ORDER BY name ASC") as DBCustomExerciseRow[];
+      const mapped: ExerciseInfo[] = rows.map((r) => ({
+        name: r.name,
+        category: r.category as "Chest" | "Back" | "Legs" | "Shoulders" | "Arms" | "Core",
+        targetMuscle: r.target_muscle || "",
+        instructions: r.instructions || "",
+      }));
+      set({ customExercises: mapped });
+    } catch (e) {
+      console.error("Failed to load custom exercises:", e);
+    }
+  },
+
+  createCustomExercise: async (
+    name: string,
+    category: "Chest" | "Back" | "Legs" | "Shoulders" | "Arms" | "Core",
+    targetMuscle: string = "",
+    instructions: string = ""
+  ) => {
+    try {
+      const trimmedName = name.trim();
+      const inStatic = EXERCISE_LIBRARY.find(
+        (ex) => ex.name.toLowerCase() === trimmedName.toLowerCase()
+      );
+      const inCustom = get().customExercises.find(
+        (ex) => ex.name.toLowerCase() === trimmedName.toLowerCase()
+      );
+      if (inStatic || inCustom) {
+        console.warn("Exercise name already exists.");
+        return false;
+      }
+      
+      const createdAt = new Date().toISOString();
+      sqliteDb.runSync(
+        `INSERT INTO custom_exercises (name, category, target_muscle, instructions, created_at)
+         VALUES (?, ?, ?, ?, ?)`,
+        trimmedName,
+        category,
+        targetMuscle.trim(),
+        instructions.trim(),
+        createdAt
+      );
+
+      await get().loadCustomExercises();
+      return true;
+    } catch (e) {
+      console.error("Failed to create custom exercise:", e);
+      return false;
     }
   },
 }));

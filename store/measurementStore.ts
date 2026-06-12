@@ -13,12 +13,12 @@ export interface MeasurementEntry {
   id: number;
   measurementDate: string;
   bodyWeight: number | null;
-  armSize: number | null;
   chestSize: number | null;
   waistSize: number | null;
-  thighSize: number | null;
-  shoulderSize: number | null;
-  neckSize: number | null;
+  leftArmSize: number | null;
+  rightArmSize: number | null;
+  leftThighSize: number | null;
+  rightThighSize: number | null;
   photos: ProgressPhotos | null;
 }
 
@@ -26,12 +26,12 @@ interface DBMeasurementRow {
   id: number;
   measurement_date: string;
   body_weight: number | null;
-  arm_size: number | null;
   chest_size: number | null;
   waist_size: number | null;
-  thigh_size: number | null;
-  shoulder_size: number | null;
-  neck_size: number | null;
+  left_arm_size: number | null;
+  right_arm_size: number | null;
+  left_thigh_size: number | null;
+  right_thigh_size: number | null;
   created_at: string;
 }
 
@@ -53,12 +53,12 @@ interface MeasurementState {
     date: string,
     metrics: {
       bodyWeight?: number;
-      armSize?: number;
       chestSize?: number;
       waistSize?: number;
-      thighSize?: number;
-      shoulderSize?: number;
-      neckSize?: number;
+      leftArmSize?: number;
+      rightArmSize?: number;
+      leftThighSize?: number;
+      rightThighSize?: number;
     },
     photos?: Partial<ProgressPhotos>
   ) => Promise<void>;
@@ -97,12 +97,12 @@ export const useMeasurementStore = create<MeasurementState>((set, get) => ({
           id: r.id,
           measurementDate: r.measurement_date,
           bodyWeight: r.body_weight || null,
-          armSize: r.arm_size || null,
           chestSize: r.chest_size || null,
           waistSize: r.waist_size || null,
-          thighSize: r.thigh_size || null,
-          shoulderSize: r.shoulder_size || null,
-          neckSize: r.neck_size || null,
+          leftArmSize: r.left_arm_size || null,
+          rightArmSize: r.right_arm_size || null,
+          leftThighSize: r.left_thigh_size || null,
+          rightThighSize: r.right_thigh_size || null,
           photos,
         });
       }
@@ -118,12 +118,12 @@ export const useMeasurementStore = create<MeasurementState>((set, get) => ({
     try {
       const createdAt = new Date().toISOString();
       const weight = metrics.bodyWeight ?? null;
-      const arm = metrics.armSize ?? null;
       const chest = metrics.chestSize ?? null;
       const waist = metrics.waistSize ?? null;
-      const thigh = metrics.thighSize ?? null;
-      const shoulder = metrics.shoulderSize ?? null;
-      const neck = metrics.neckSize ?? null;
+      const leftArm = metrics.leftArmSize ?? null;
+      const rightArm = metrics.rightArmSize ?? null;
+      const leftThigh = metrics.leftThighSize ?? null;
+      const rightThigh = metrics.rightThighSize ?? null;
 
       sqliteDb.execSync("BEGIN TRANSACTION;");
       let measurementId: number;
@@ -131,16 +131,16 @@ export const useMeasurementStore = create<MeasurementState>((set, get) => ({
       try {
         const result = sqliteDb.runSync(
           `INSERT INTO measurements (
-            measurement_date, body_weight, arm_size, chest_size, waist_size, thigh_size, shoulder_size, neck_size, created_at
+            measurement_date, body_weight, chest_size, waist_size, left_arm_size, right_arm_size, left_thigh_size, right_thigh_size, created_at
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           date,
           weight,
-          arm,
           chest,
           waist,
-          thigh,
-          shoulder,
-          neck,
+          leftArm,
+          rightArm,
+          leftThigh,
+          rightThigh,
           createdAt
         );
         
@@ -194,6 +194,7 @@ export const useMeasurementStore = create<MeasurementState>((set, get) => ({
       await get().loadMeasurements();
     } catch (e) {
       console.error("Failed to add measurement entry:", e);
+      throw e;
     }
   },
 
