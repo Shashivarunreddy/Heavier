@@ -5,11 +5,16 @@ import { useMeasurementStore, MeasurementEntry, ProgressPhotos } from "@/store/m
 import { useUserStore } from "@/store/userStore";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 export default function ProgressCompare() {
   const router = useRouter();
   const { measurements } = useMeasurementStore();
   const { settings } = useUserStore();
+  const { isDarkColorScheme } = useColorScheme();
+
+  const iconColor = isDarkColorScheme ? "#ffffff" : "#18181b";
+  const mutedIconColor = isDarkColorScheme ? "#a1a1aa" : "#71717a";
 
   const [entryA, setEntryA] = useState<MeasurementEntry | null>(measurements[1] || null);
   const [entryB, setEntryB] = useState<MeasurementEntry | null>(measurements[0] || null);
@@ -27,25 +32,25 @@ export default function ProgressCompare() {
   };
 
   const getDiffText = (valA: number | null, valB: number | null, unit: string) => {
-    if (valA === null || valB === null) return { text: "--", color: "text-zinc-500" };
+    if (valA === null || valB === null) return { text: "--", color: "text-muted-foreground" };
     const diff = valB - valA;
-    if (diff === 0) return { text: "0.0", color: "text-zinc-600 dark:text-zinc-400 dark:text-zinc-400" };
+    if (diff === 0) return { text: "0.0", color: "text-muted-foreground" };
     const sign = diff > 0 ? "+" : "";
     return {
       text: `${sign}${diff.toFixed(1)} ${unit}`,
-      color: diff > 0 ? "text-emerald-400 font-bold" : "text-rose-400 font-bold",
+      color: diff > 0 ? "text-accent font-bold" : "text-destructive font-bold",
     };
   };
 
   const renderComparisonRow = (label: string, valA: number | null, valB: number | null, unit: string) => {
     const diff = getDiffText(valA, valB, unit);
     return (
-      <View className="flex-row justify-between items-center py-2.5 border-b border-zinc-200 dark:border-zinc-800 dark:border-zinc-800/40">
-        <Text className="text-zinc-600 dark:text-zinc-400 dark:text-zinc-400 text-xs font-semibold">{label}</Text>
+      <View className="flex-row justify-between items-center py-2.5 border-b border-border/40">
+        <Text className="text-muted-foreground text-xs font-semibold">{label}</Text>
         <View className="flex-row gap-6 items-center">
-          <Text className="text-zinc-500 text-xs font-bold">{valA !== null ? `${valA} ${unit}` : "--"}</Text>
-          <Text className="text-zinc-500 text-xs font-bold">→</Text>
-          <Text className="text-zinc-900 dark:text-white text-xs font-bold">{valB !== null ? `${valB} ${unit}` : "--"}</Text>
+          <Text className="text-muted-foreground text-xs font-bold">{valA !== null ? `${valA} ${unit}` : "--"}</Text>
+          <Text className="text-muted-foreground text-xs font-bold">→</Text>
+          <Text className="text-foreground text-xs font-bold">{valB !== null ? `${valB} ${unit}` : "--"}</Text>
           <Text className={`${diff.color} text-xs text-right w-16`}>{diff.text}</Text>
         </View>
       </View>
@@ -55,16 +60,16 @@ export default function ProgressCompare() {
   const angles: (keyof ProgressPhotos)[] = ["front", "left", "right", "back"];
 
   return (
-    <SafeAreaView className="flex-1 bg-zinc-50 dark:bg-zinc-950">
+    <SafeAreaView className="flex-1 bg-background">
       {/* Header */}
-      <View className="flex-row justify-between items-center px-6 py-4 border-b border-zinc-900 bg-zinc-50 dark:bg-zinc-950 z-10">
+      <View className="flex-row justify-between items-center px-6 py-4 border-b border-border bg-background z-10">
         <Pressable
           onPress={() => router.back()}
-          className="w-10 h-10 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 justify-center items-center active:scale-95"
+          className="w-10 h-10 rounded-xl bg-card border border-border justify-center items-center active:scale-95"
         >
-          <Ionicons name="chevron-back" size={20} color="#ffffff" />
+          <Ionicons name="chevron-back" size={20} color={iconColor} />
         </Pressable>
-        <Text className="text-zinc-900 dark:text-white text-lg font-black tracking-tight">Compare Progress</Text>
+        <Text className="text-foreground text-lg font-black tracking-tight">Compare Progress</Text>
         <View className="w-10 h-10" />
       </View>
 
@@ -74,10 +79,10 @@ export default function ProgressCompare() {
           {/* Select A */}
           <Pressable
             onPress={() => setSelectorTarget("A")}
-            className="flex-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800/60 rounded-2xl p-3.5 items-center active:scale-95 transition-all"
+            className="flex-1 bg-card border border-border rounded-2xl p-3.5 items-center active:scale-95 transition-all"
           >
-            <Text className="text-zinc-500 text-[9px] font-black uppercase tracking-wider mb-1">Log A (Earlier)</Text>
-            <Text className="text-zinc-900 dark:text-white font-bold text-xs">
+            <Text className="text-muted-foreground text-[9px] font-black uppercase tracking-wider mb-1">Log A (Earlier)</Text>
+            <Text className="text-foreground font-bold text-xs">
               {entryA
                 ? new Date(entryA.measurementDate).toLocaleDateString(undefined, {
                     month: "short",
@@ -90,16 +95,16 @@ export default function ProgressCompare() {
 
           {/* Icon */}
           <View className="justify-center items-center">
-            <Ionicons name="arrow-forward" size={16} color="#71717a" />
+            <Ionicons name="arrow-forward" size={16} color={mutedIconColor} />
           </View>
 
           {/* Select B */}
           <Pressable
             onPress={() => setSelectorTarget("B")}
-            className="flex-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800/60 rounded-2xl p-3.5 items-center active:scale-95 transition-all"
+            className="flex-1 bg-card border border-border rounded-2xl p-3.5 items-center active:scale-95 transition-all"
           >
-            <Text className="text-zinc-500 text-[9px] font-black uppercase tracking-wider mb-1">Log B (Later)</Text>
-            <Text className="text-zinc-900 dark:text-white font-bold text-xs">
+            <Text className="text-muted-foreground text-[9px] font-black uppercase tracking-wider mb-1">Log B (Later)</Text>
+            <Text className="text-foreground font-bold text-xs">
               {entryB
                 ? new Date(entryB.measurementDate).toLocaleDateString(undefined, {
                     month: "short",
@@ -114,8 +119,8 @@ export default function ProgressCompare() {
         {entryA && entryB ? (
           <View className="gap-6 pb-12">
             {/* Dimensions Table */}
-            <View className="bg-white dark:bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 rounded-3xl p-5">
-              <Text className="text-zinc-500 text-xs font-semibold uppercase tracking-wider mb-3">Measurement Deltas</Text>
+            <View className="bg-card border border-border rounded-3xl p-5">
+              <Text className="text-muted-foreground text-xs font-semibold uppercase tracking-wider mb-3">Measurement Deltas</Text>
               
               {renderComparisonRow("Weight", entryA.bodyWeight, entryB.bodyWeight, settings.weightUnit)}
               {renderComparisonRow("Chest", entryA.chestSize, entryB.chestSize, settings.lengthUnit)}
@@ -127,22 +132,22 @@ export default function ProgressCompare() {
             </View>
 
             {/* Photos Side-by-Side */}
-            <View className="bg-white dark:bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 rounded-3xl p-5">
-              <Text className="text-zinc-500 text-xs font-semibold uppercase tracking-wider mb-3">Photo Compare</Text>
+            <View className="bg-card border border-border rounded-3xl p-5">
+              <Text className="text-muted-foreground text-xs font-semibold uppercase tracking-wider mb-3">Photo Compare</Text>
               
               {/* Angle selector tabs */}
-              <View className="flex-row justify-between bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/60 rounded-xl p-1 mb-4">
+              <View className="flex-row justify-between bg-background border border-border/60 rounded-xl p-1 mb-4">
                 {angles.map((ang) => (
                   <Pressable
                     key={ang}
                     onPress={() => setSelectedAngle(ang)}
                     className={`flex-1 py-1.5 rounded-lg justify-center items-center ${
-                      selectedAngle === ang ? "bg-emerald-500" : ""
+                      selectedAngle === ang ? "bg-accent" : ""
                     }`}
                   >
                     <Text
                       className={`text-[9px] font-black uppercase tracking-wider ${
-                        selectedAngle === ang ? "text-zinc-950" : "text-zinc-500"
+                        selectedAngle === ang ? "text-accent-foreground" : "text-muted-foreground"
                       }`}
                     >
                       {ang}
@@ -153,41 +158,41 @@ export default function ProgressCompare() {
 
               {/* Photos container */}
               <View className="flex-row gap-3 h-[240px]">
-                <View className="flex-1 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/60 rounded-2xl overflow-hidden justify-center items-center">
+                <View className="flex-1 bg-background border border-border rounded-2xl overflow-hidden justify-center items-center">
                   {entryA.photos?.[selectedAngle] ? (
                     <Image source={{ uri: entryA.photos[selectedAngle]! }} className="w-full h-full object-cover" />
                   ) : (
                     <View className="items-center">
-                      <Ionicons name="camera-outline" size={24} color="#3f3f46" className="mb-1" />
-                      <Text className="text-zinc-600 text-[10px] font-bold uppercase tracking-wider">No Photo</Text>
+                      <Ionicons name="camera-outline" size={24} color={mutedIconColor} className="mb-1" />
+                      <Text className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider">No Photo</Text>
                     </View>
                   )}
                   <View className="absolute bottom-2 left-2 bg-black/60 px-2 py-0.5 rounded-md">
-                    <Text className="text-zinc-900 dark:text-white text-[8px] font-black uppercase tracking-wider">A: Earlier</Text>
+                    <Text className="text-white text-[8px] font-black uppercase tracking-wider">A: Earlier</Text>
                   </View>
                 </View>
 
-                <View className="flex-1 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/60 rounded-2xl overflow-hidden justify-center items-center">
+                <View className="flex-1 bg-background border border-border rounded-2xl overflow-hidden justify-center items-center">
                   {entryB.photos?.[selectedAngle] ? (
                     <Image source={{ uri: entryB.photos[selectedAngle]! }} className="w-full h-full object-cover" />
                   ) : (
                     <View className="items-center">
-                      <Ionicons name="camera-outline" size={24} color="#3f3f46" className="mb-1" />
-                      <Text className="text-zinc-600 text-[10px] font-bold uppercase tracking-wider">No Photo</Text>
+                      <Ionicons name="camera-outline" size={24} color={mutedIconColor} className="mb-1" />
+                      <Text className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider">No Photo</Text>
                     </View>
                   )}
                   <View className="absolute bottom-2 left-2 bg-black/60 px-2 py-0.5 rounded-md">
-                    <Text className="text-zinc-900 dark:text-white text-[8px] font-black uppercase tracking-wider">B: Later</Text>
+                    <Text className="text-white text-[8px] font-black uppercase tracking-wider">B: Later</Text>
                   </View>
                 </View>
               </View>
             </View>
           </View>
         ) : (
-          <View className="bg-white dark:bg-zinc-900/10 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800/60 border-dashed rounded-3xl p-12 justify-center items-center">
-            <Ionicons name="git-compare-outline" size={42} color="#52525b" className="mb-2" />
-            <Text className="text-zinc-600 dark:text-zinc-400 dark:text-zinc-400 text-sm font-bold text-center">Select two check-in entries.</Text>
-            <Text className="text-zinc-600 text-xs text-center mt-1">
+          <View className="bg-card border border-border border-dashed rounded-3xl p-12 justify-center items-center">
+            <Ionicons name="git-compare-outline" size={42} color={mutedIconColor} className="mb-2" />
+            <Text className="text-muted-foreground text-sm font-bold text-center">Select two check-in entries.</Text>
+            <Text className="text-muted-foreground text-xs text-center mt-1">
               Select date ranges at the top to compute delta calculations.
             </Text>
           </View>
@@ -201,14 +206,14 @@ export default function ProgressCompare() {
         presentationStyle="pageSheet"
         onRequestClose={() => setSelectorTarget(null)}
       >
-        <SafeAreaView className="flex-1 bg-zinc-50 dark:bg-zinc-950">
-          <View className="flex-row justify-between items-center px-6 py-4 border-b border-zinc-900">
-            <Text className="text-zinc-900 dark:text-white text-lg font-black tracking-tight">Select check-in entry</Text>
+        <SafeAreaView className="flex-1 bg-background">
+          <View className="flex-row justify-between items-center px-6 py-4 border-b border-border">
+            <Text className="text-foreground text-lg font-black tracking-tight">Select check-in entry</Text>
             <Pressable
               onPress={() => setSelectorTarget(null)}
-              className="w-10 h-10 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 justify-center items-center"
+              className="w-10 h-10 rounded-xl bg-card border border-border justify-center items-center"
             >
-              <Ionicons name="close" size={20} color="#ffffff" />
+              <Ionicons name="close" size={20} color={iconColor} />
             </Pressable>
           </View>
 
@@ -218,10 +223,10 @@ export default function ProgressCompare() {
                 <Pressable
                   key={item.id}
                   onPress={() => handleSelectEntry(item)}
-                  className="bg-white dark:bg-zinc-900 border border-zinc-900 rounded-2xl p-4 flex-row justify-between items-center active:scale-[0.99]"
+                  className="bg-card border border-border rounded-2xl p-4 flex-row justify-between items-center active:scale-[0.99]"
                 >
                   <View>
-                    <Text className="text-zinc-900 dark:text-white font-bold text-sm">
+                    <Text className="text-foreground font-bold text-sm">
                       {new Date(item.measurementDate).toLocaleDateString(undefined, {
                         month: "long",
                         day: "numeric",
@@ -229,12 +234,12 @@ export default function ProgressCompare() {
                       })}
                     </Text>
                     {item.bodyWeight ? (
-                      <Text className="text-zinc-500 text-xs mt-0.5">
+                      <Text className="text-muted-foreground text-xs mt-0.5">
                         Weight: {item.bodyWeight} {settings.weightUnit}
                       </Text>
                     ) : null}
                   </View>
-                  <Ionicons name="chevron-forward" size={16} color="#71717a" />
+                  <Ionicons name="chevron-forward" size={16} color={mutedIconColor} />
                 </Pressable>
               ))}
             </View>

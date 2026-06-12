@@ -152,8 +152,10 @@ export function initializeDatabase() {
 
   try {
     const cols = expoDb.getAllSync("PRAGMA table_info(exercises)") as { name: string }[];
-    const hasCol = (name: string) => cols.some(c => c.name === name);
+    const hasCol = (colName: string) => cols.some(c => c.name === colName);
     if (!hasCol("workout_id") && hasCol("workoutId")) expoDb.execSync("ALTER TABLE exercises RENAME COLUMN workoutId TO workout_id;");
+    // Handle old schema where exercise name column was called "name" (not "exerciseName" or "exercise_name")
+    if (!hasCol("exercise_name") && hasCol("name")) expoDb.execSync("ALTER TABLE exercises RENAME COLUMN name TO exercise_name;");
     if (!hasCol("exercise_name") && hasCol("exerciseName")) expoDb.execSync("ALTER TABLE exercises RENAME COLUMN exerciseName TO exercise_name;");
     if (!hasCol("set_number") && hasCol("setNumber")) expoDb.execSync("ALTER TABLE exercises RENAME COLUMN setNumber TO set_number;");
     if (!hasCol("is_completed") && hasCol("isCompleted")) expoDb.execSync("ALTER TABLE exercises RENAME COLUMN isCompleted TO is_completed;");

@@ -15,8 +15,8 @@
   --secondary-foreground: 240 5.9% 10%;
   --muted: 240 4.8% 95.9%;
   --muted-foreground: 240 3.8% 46.1%;
-  --accent: 240 4.8% 95.9%;
-  --accent-foreground: 240 5.9% 10%;
+  --accent: 159.6 84.3% 39.4%; /* #10b981 (emerald-500) */
+  --accent-foreground: 240 10% 3.9%; /* #09090b (zinc-950) */
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 0 0% 98%;
   --border: 240 5.9% 90%;
@@ -38,11 +38,66 @@
   --secondary-foreground: 0 0% 98%;
   --muted: 240 3.7% 15.9%;
   --muted-foreground: 240 5% 64.9%;
-  --accent: 240 3.7% 15.9%;
-  --accent-foreground: 0 0% 98%;
+  --accent: 159.9 66.2% 52.5%; /* #34d399 (emerald-400) */
+  --accent-foreground: 240 10% 3.9%; /* #09090b (zinc-950) */
   --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 98%;
   --border: 240 3.7% 15.9%;
   --input: 240 3.7% 15.9%;
   --ring: 240 4.9% 83.9%;
 }
+
+/* Custom Fonts Weight Mappings */
+.font-normal {
+  font-family: 'Inter-Regular';
+}
+.font-medium {
+  font-family: 'Inter-Medium';
+}
+.font-semibold {
+  font-family: 'Inter-SemiBold';
+}
+.font-bold {
+  font-family: 'Inter-Bold';
+}
+.font-black {
+  font-family: 'Sora-Bold';
+}
+
+/* Sora Explicit Font Utilities */
+.font-sora {
+  font-family: 'Sora-Regular';
+}
+.font-sora-medium {
+  font-family: 'Sora-Medium';
+}
+.font-sora-semibold {
+  font-family: 'Sora-SemiBold';
+}
+.font-sora-bold {
+  font-family: 'Sora-Bold';
+}
+
+/* Inter Explicit Font Utilities */
+.font-inter {
+  font-family: 'Inter-Regular';
+}
+.font-inter-medium {
+  font-family: 'Inter-Medium';
+}
+.font-inter-semibold {
+  font-family: 'Inter-SemiBold';
+}
+.font-inter-bold {
+  font-family: 'Inter-Bold';
+}
+
+/* Base tag overrides for React Native components */
+text {
+  font-family: 'Inter-Regular';
+}
+input {
+  font-family: 'Inter-Regular';
+}
+
+

@@ -11,6 +11,8 @@ import { useWorkoutStore } from "../store/workoutStore";
 import { useMeasurementStore } from "../store/measurementStore";
 import { View, ActivityIndicator } from "react-native";
 import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
+import { useFonts } from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
 
 // Suppress Reanimated warnings about reading values during component render
 configureReanimatedLogger({
@@ -28,11 +30,25 @@ const DARK_THEME = {
   colors: NAV_THEME.dark,
 };
 
+// Prevent the splash screen from auto-hiding before font loading is complete.
+SplashScreen.preventAutoHideAsync().catch(() => {});
+
 export default function RootLayout() {
   const { isDarkColorScheme, setColorScheme } = useColorScheme();
-  const { loadUser, settings, isLoading } = useUserStore();
+  const { loadUser, settings, isLoading: isUserLoading } = useUserStore();
   const { loadTemplates, loadWorkoutHistory, loadCustomExercises } = useWorkoutStore();
   const { loadMeasurements } = useMeasurementStore();
+
+  const [fontsLoaded, fontError] = useFonts({
+    "Sora-Regular": require("../assets/fonts/Sora/static/Sora-Regular.ttf"),
+    "Sora-Medium": require("../assets/fonts/Sora/static/Sora-Medium.ttf"),
+    "Sora-SemiBold": require("../assets/fonts/Sora/static/Sora-SemiBold.ttf"),
+    "Sora-Bold": require("../assets/fonts/Sora/static/Sora-Bold.ttf"),
+    "Inter-Regular": require("../assets/fonts/Inter/static/Inter_18pt-Regular.ttf"),
+    "Inter-Medium": require("../assets/fonts/Inter/static/Inter_18pt-Medium.ttf"),
+    "Inter-SemiBold": require("../assets/fonts/Inter/static/Inter_18pt-SemiBold.ttf"),
+    "Inter-Bold": require("../assets/fonts/Inter/static/Inter_18pt-Bold.ttf"),
+  });
 
   useEffect(() => {
     // 1. Initialize SQLite Database
@@ -47,15 +63,21 @@ export default function RootLayout() {
   }, [loadUser, loadTemplates, loadWorkoutHistory, loadCustomExercises, loadMeasurements]);
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!isUserLoading) {
       setColorScheme(settings.theme);
     }
-  }, [settings.theme, isLoading, setColorScheme]);
+  }, [settings.theme, isUserLoading, setColorScheme]);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (fontsLoaded || fontError) {
+      SplashScreen.hideAsync().catch(() => {});
+    }
+  }, [fontsLoaded, fontError]);
+
+  if (isUserLoading || (!fontsLoaded && !fontError)) {
     return (
-      <View className="flex-1 justify-center items-center bg-zinc-50 dark:bg-zinc-950">
-        <ActivityIndicator size="large" color="#10b981" />
+      <View className="flex-1 justify-center items-center bg-background">
+        <ActivityIndicator size="large" color={isDarkColorScheme ? "#34d399" : "#10b981"} />
       </View>
     );
   }

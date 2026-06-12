@@ -1,33 +1,37 @@
 import { View, Text, ScrollView, Dimensions } from "react-native";
 import { useWorkoutStore } from "@/store/workoutStore";
+import SectionHeader from "../../components/SectionHeader";
+import EmptyState from "../../components/EmptyState";
+import Card from "../../components/Card";
 import { useMeasurementStore } from "@/store/measurementStore";
 import { useUserStore } from "@/store/userStore";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
 import { LineChart, BarChart } from "react-native-chart-kit";
 import { useMemo } from "react";
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 export default function Analytics() {
   const { workoutHistory } = useWorkoutStore();
   const { measurements } = useMeasurementStore();
   const { settings } = useUserStore();
+  const { isDarkColorScheme } = useColorScheme();
 
   const screenWidth = Dimensions.get("window").width - 32;
 
   // Chart Styling config
   const chartConfig = {
-    backgroundGradientFrom: "#18181b",
-    backgroundGradientTo: "#09090b",
+    backgroundGradientFrom: isDarkColorScheme ? "#18181b" : "#ffffff",
+    backgroundGradientTo: isDarkColorScheme ? "#09090b" : "#ffffff",
     decimalPlaces: 1,
-    color: (opacity = 1) => `rgba(16, 185, 129, ${opacity})`,
-    labelColor: (opacity = 1) => `rgba(161, 161, 170, ${opacity})`,
+    color: (opacity = 1) => isDarkColorScheme ? `rgba(52, 211, 153, ${opacity})` : `rgba(16, 185, 129, ${opacity})`,
+    labelColor: (opacity = 1) => isDarkColorScheme ? `rgba(161, 161, 170, ${opacity})` : `rgba(113, 113, 122, ${opacity})`,
     style: {
       borderRadius: 16,
     },
     propsForDots: {
       r: "4",
       strokeWidth: "2",
-      stroke: "#10b981",
+      stroke: isDarkColorScheme ? "#34d399" : "#10b981",
     },
   };
 
@@ -158,22 +162,22 @@ export default function Analytics() {
   }, [workoutHistory]);
 
   return (
-    <SafeAreaView className="flex-1 bg-zinc-50 dark:bg-zinc-950">
+    <SafeAreaView className="flex-1 bg-background">
       <ScrollView className="flex-grow px-6 py-4" showsVerticalScrollIndicator={false}>
         
         {/* Header */}
         <View className="mb-6">
-          <Text className="text-3xl font-black text-zinc-900 dark:text-white tracking-tight">Analytics</Text>
-          <Text className="text-zinc-500 text-sm mt-1">
+          <Text className="text-3xl font-black text-foreground tracking-tight">Analytics</Text>
+          <Text className="text-muted-foreground text-sm mt-1">
             Analyze logs and strength metrics.
           </Text>
         </View>
 
         {/* Weight Progression Card */}
         <View className="mb-8">
-          <Text className="text-zinc-500 text-xs font-semibold uppercase tracking-wider mb-3">Weight History</Text>
+          <SectionHeader title="Weight History" />
           {weightData ? (
-            <View className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 rounded-3xl p-4 items-center">
+            <Card className="items-center">
               <LineChart
                 data={weightData}
                 width={screenWidth}
@@ -185,22 +189,23 @@ export default function Analytics() {
                   borderRadius: 16,
                 }}
               />
-            </View>
+            </Card>
           ) : (
-            <View className="bg-zinc-100 dark:bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800/60 border-dashed rounded-3xl p-8 justify-center items-center">
-              <Ionicons name="scale-outline" size={32} color="#52525b" className="mb-2" />
-              <Text className="text-zinc-500 text-xs font-bold uppercase tracking-wider text-center">
-                Need at least 2 weight logs to plot progression.
-              </Text>
-            </View>
+            <EmptyState
+              iconName="scale-outline"
+              title="Need at least 2 weight logs to plot progression."
+              containerClassName="bg-muted border border-border/60 border-dashed rounded-3xl p-8 justify-center items-center"
+              titleClassName="text-muted-foreground text-xs font-bold uppercase tracking-wider text-center"
+              iconSize={32}
+            />
           )}
         </View>
 
         {/* Consistency Card */}
         <View className="mb-8">
-          <Text className="text-zinc-500 text-xs font-semibold uppercase tracking-wider mb-3">Training Consistency</Text>
+          <SectionHeader title="Training Consistency" />
           {frequencyData ? (
-            <View className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 rounded-3xl p-4 items-center">
+            <Card className="items-center">
               <BarChart
                 data={frequencyData}
                 width={screenWidth}
@@ -213,20 +218,21 @@ export default function Analytics() {
                   borderRadius: 16,
                 }}
               />
-            </View>
+            </Card>
           ) : (
-            <View className="bg-zinc-100 dark:bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800/60 border-dashed rounded-3xl p-8 justify-center items-center">
-              <Ionicons name="barbell-outline" size={32} color="#52525b" className="mb-2" />
-              <Text className="text-zinc-500 text-xs font-bold uppercase tracking-wider text-center">
-                Log workouts to see consistency statistics.
-              </Text>
-            </View>
+            <EmptyState
+              iconName="barbell-outline"
+              title="Log workouts to see consistency statistics."
+              containerClassName="bg-muted border border-border/60 border-dashed rounded-3xl p-8 justify-center items-center"
+              titleClassName="text-muted-foreground text-xs font-bold uppercase tracking-wider text-center"
+              iconSize={32}
+            />
           )}
         </View>
 
         {/* Strength Progress Card */}
         <View className="mb-8">
-          <Text className="text-zinc-500 text-xs font-semibold uppercase tracking-wider mb-3">Strength Progression (Max Weight)</Text>
+          <SectionHeader title="Strength Progression (Max Weight)" />
           {Object.entries(strengthData).map(([name, logs]) => {
             if (logs.length < 2) return null;
             
@@ -234,10 +240,10 @@ export default function Analytics() {
               labels: logs.slice(-5).map((l) => l.date),
               datasets: [{ data: logs.slice(-5).map((l) => l.weight) }],
             };
-
+ 
             return (
-              <View key={name} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 rounded-3xl p-4 items-center mb-4">
-                <Text className="text-zinc-900 dark:text-white text-xs font-black self-start mb-2 px-2 uppercase tracking-wide">
+              <Card key={name} className="items-center mb-4">
+                <Text className="text-foreground text-xs font-black self-start mb-2 px-2 uppercase tracking-wide">
                   {name} ({settings.weightUnit})
                 </Text>
                 <LineChart
@@ -249,36 +255,36 @@ export default function Analytics() {
                     borderRadius: 16,
                   }}
                 />
-              </View>
+              </Card>
             );
           })}
           {Object.values(strengthData).every((logs) => logs.length < 2) ? (
-            <View className="bg-zinc-100 dark:bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800/60 border-dashed rounded-3xl p-6 justify-center items-center">
-              <Text className="text-zinc-500 text-xs font-bold uppercase tracking-wider text-center">
-                Log Bench Press, Squat, or Deadlifts repeatedly to plot strength progress.
-              </Text>
-            </View>
+            <EmptyState
+              title="Log Bench Press, Squat, or Deadlifts repeatedly to plot strength progress."
+              containerClassName="bg-muted border border-border/60 border-dashed rounded-3xl p-6 justify-center items-center"
+              titleClassName="text-muted-foreground text-xs font-bold uppercase tracking-wider text-center"
+            />
           ) : null}
         </View>
 
         {/* Personal Records List */}
         <View className="mb-12">
-          <Text className="text-zinc-500 text-xs font-semibold uppercase tracking-wider mb-3">All Personal Records</Text>
+          <SectionHeader title="All Personal Records" />
           {personalRecords.length > 0 ? (
-            <View className="bg-white dark:bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 rounded-3xl p-5">
+            <Card>
               {personalRecords.map((item, idx) => (
                 <View
                   key={idx}
                   className={`flex-row justify-between items-center py-2.5 ${
-                    idx !== personalRecords.length - 1 ? "border-b border-zinc-200 dark:border-zinc-800 dark:border-zinc-800/40" : ""
+                    idx !== personalRecords.length - 1 ? "border-b border-border/40" : ""
                   }`}
                 >
-                  <Text className="text-zinc-600 dark:text-zinc-400 dark:text-zinc-400 text-xs font-semibold">{item.name}</Text>
+                  <Text className="text-muted-foreground text-xs font-semibold">{item.name}</Text>
                   <View className="items-end">
-                    <Text className="text-zinc-900 dark:text-white text-xs font-black">
+                    <Text className="text-foreground text-xs font-black">
                       {item.weight} {settings.weightUnit}
                     </Text>
-                    <Text className="text-zinc-600 text-[9px] mt-0.5 font-medium">
+                    <Text className="text-muted-foreground text-[9px] mt-0.5 font-medium">
                       {new Date(item.date).toLocaleDateString(undefined, {
                         month: "short",
                         day: "numeric",
@@ -288,14 +294,15 @@ export default function Analytics() {
                   </View>
                 </View>
               ))}
-            </View>
+            </Card>
           ) : (
-            <View className="bg-zinc-100 dark:bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800/60 border-dashed rounded-3xl p-8 justify-center items-center">
-              <Ionicons name="trophy-outline" size={32} color="#52525b" className="mb-2" />
-              <Text className="text-zinc-500 text-xs font-bold uppercase tracking-wider text-center">
-                Records appear as you complete sets.
-              </Text>
-            </View>
+            <EmptyState
+              iconName="trophy-outline"
+              title="Records appear as you complete sets."
+              containerClassName="bg-muted border border-border/60 border-dashed rounded-3xl p-8 justify-center items-center"
+              titleClassName="text-muted-foreground text-xs font-bold uppercase tracking-wider text-center"
+              iconSize={32}
+            />
           )}
         </View>
 

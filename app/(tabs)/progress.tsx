@@ -1,16 +1,25 @@
 import { useState } from "react";
-import { View, Text, TextInput, Pressable, ScrollView, Image, Alert } from "react-native";
+import { View, Text, Pressable, ScrollView, Image, Alert } from "react-native";
+import Card from "../../components/Card";
+import Input from "../../components/Input";
+import SectionHeader from "../../components/SectionHeader";
+import EmptyState from "../../components/EmptyState";
 import { useRouter, Href } from "expo-router";
 import { useMeasurementStore, ProgressPhotos } from "@/store/measurementStore";
 import { useUserStore } from "@/store/userStore";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 export default function Progress() {
   const router = useRouter();
   const { measurements, addMeasurement, deleteMeasurement } = useMeasurementStore();
   const { settings } = useUserStore();
+  const { isDarkColorScheme } = useColorScheme();
+
+  const accentIconColor = isDarkColorScheme ? "#34d399" : "#10b981";
+  const mutedIconColor = isDarkColorScheme ? "#a1a1aa" : "#71717a";
 
   const [weight, setWeight] = useState("");
   const [chest, setChest] = useState("");
@@ -140,24 +149,24 @@ export default function Progress() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-zinc-50 dark:bg-zinc-950">
+    <SafeAreaView className="flex-1 bg-background">
       <ScrollView className="flex-grow px-6 py-4" showsVerticalScrollIndicator={false}>
         
         {/* Header */}
         <View className="flex-row justify-between items-center mb-6">
           <View>
-            <Text className="text-3xl font-black text-zinc-900 dark:text-white tracking-tight">Progress Log</Text>
-            <Text className="text-zinc-500 text-sm mt-1">
+            <Text className="text-3xl font-black text-foreground tracking-tight">Progress Log</Text>
+            <Text className="text-muted-foreground text-sm mt-1">
               Track weight changes, body size, and photos.
             </Text>
           </View>
           {measurements.length >= 2 ? (
             <Pressable
               onPress={() => router.push("/progress-compare" as Href)}
-              className="w-10 h-10 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 justify-center items-center active:scale-95"
+              className="w-10 h-10 rounded-xl bg-card border border-border justify-center items-center active:scale-95"
               aria-label="Compare progress entries"
             >
-              <Ionicons name="git-compare-outline" size={20} color="#10b981" />
+              <Ionicons name="git-compare-outline" size={20} color={accentIconColor} />
             </Pressable>
           ) : null}
         </View>
@@ -165,58 +174,52 @@ export default function Progress() {
         {/* Toggle Logger Form */}
         <Pressable
           onPress={() => setIsLoggingOpen(!isLoggingOpen)}
-          className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 rounded-3xl p-5 mb-6 flex-row justify-between items-center active:scale-[0.99]"
+          className="bg-card border border-border rounded-3xl p-5 mb-6 flex-row justify-between items-center active:scale-[0.99]"
         >
           <View>
-            <Text className="text-zinc-900 dark:text-white text-base font-black tracking-tight">New Check-In</Text>
-            <Text className="text-zinc-500 text-xs mt-1">Record weight and dimensions</Text>
+            <Text className="text-foreground text-base font-black tracking-tight">New Check-In</Text>
+            <Text className="text-muted-foreground text-xs mt-1">Record weight and dimensions</Text>
           </View>
           <Ionicons
             name={isLoggingOpen ? "chevron-up" : "chevron-down"}
             size={18}
-            color="#10b981"
+            color={accentIconColor}
           />
         </Pressable>
 
         {/* Logger Form Drawer */}
         {isLoggingOpen ? (
-          <View className="bg-zinc-100 dark:bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/60 rounded-3xl p-5 mb-8 gap-5">
+          <View className="bg-muted border border-border/60 rounded-3xl p-5 mb-8 gap-5">
             <View className="flex-row gap-4">
               <View className="flex-1">
-                <Text className="text-zinc-500 text-[10px] font-black uppercase tracking-wider mb-2">Weight ({settings.weightUnit})</Text>
-                <TextInput
+                <Text className="text-muted-foreground text-[10px] font-black uppercase tracking-wider mb-2">Weight ({settings.weightUnit})</Text>
+                <Input
                   value={weight}
                   onChangeText={setWeight}
                   keyboardType="numeric"
                   placeholder="e.g. 75.4"
-                  placeholderTextColor="#3f3f46"
-                  className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 text-zinc-900 dark:text-white px-3 py-2.5 rounded-xl font-bold text-xs focus:border-emerald-500"
                 />
               </View>
 
               <View className="flex-1">
-                <Text className="text-zinc-500 text-[10px] font-black uppercase tracking-wider mb-2">Chest ({settings.lengthUnit})</Text>
-                <TextInput
+                <Text className="text-muted-foreground text-[10px] font-black uppercase tracking-wider mb-2">Chest ({settings.lengthUnit})</Text>
+                <Input
                   value={chest}
                   onChangeText={setChest}
                   keyboardType="numeric"
                   placeholder="e.g. 102"
-                  placeholderTextColor="#3f3f46"
-                  className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 text-zinc-900 dark:text-white px-3 py-2.5 rounded-xl font-bold text-xs focus:border-emerald-500"
                 />
               </View>
             </View>
 
             <View className="flex-row gap-4">
               <View className="flex-1">
-                <Text className="text-zinc-500 text-[10px] font-black uppercase tracking-wider mb-2">Waist ({settings.lengthUnit})</Text>
-                <TextInput
+                <Text className="text-muted-foreground text-[10px] font-black uppercase tracking-wider mb-2">Waist ({settings.lengthUnit})</Text>
+                <Input
                   value={waist}
                   onChangeText={setWaist}
                   keyboardType="numeric"
                   placeholder="e.g. 82.0"
-                  placeholderTextColor="#3f3f46"
-                  className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 text-zinc-900 dark:text-white px-3 py-2.5 rounded-xl font-bold text-xs focus:border-emerald-500"
                 />
               </View>
               <View className="flex-1" />
@@ -224,77 +227,69 @@ export default function Progress() {
 
             <View className="flex-row gap-4">
               <View className="flex-1">
-                <Text className="text-zinc-500 text-[10px] font-black uppercase tracking-wider mb-2">Left Arm ({settings.lengthUnit})</Text>
-                <TextInput
+                <Text className="text-muted-foreground text-[10px] font-black uppercase tracking-wider mb-2">Left Arm ({settings.lengthUnit})</Text>
+                <Input
                   value={leftArm}
                   onChangeText={setLeftArm}
                   keyboardType="numeric"
                   placeholder="e.g. 36.5"
-                  placeholderTextColor="#3f3f46"
-                  className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 text-zinc-900 dark:text-white px-3 py-2.5 rounded-xl font-bold text-xs focus:border-emerald-500"
                 />
               </View>
 
-              <View className="flex-1">
-                <Text className="text-zinc-500 text-[10px] font-black uppercase tracking-wider mb-2">Right Arm ({settings.lengthUnit})</Text>
-                <TextInput
+              <View className="flex-grow flex-1">
+                <Text className="text-muted-foreground text-[10px] font-black uppercase tracking-wider mb-2">Right Arm ({settings.lengthUnit})</Text>
+                <Input
                   value={rightArm}
                   onChangeText={setRightArm}
                   keyboardType="numeric"
                   placeholder="e.g. 36.7"
-                  placeholderTextColor="#3f3f46"
-                  className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 text-zinc-900 dark:text-white px-3 py-2.5 rounded-xl font-bold text-xs focus:border-emerald-500"
                 />
               </View>
             </View>
 
             <View className="flex-row gap-4">
               <View className="flex-1">
-                <Text className="text-zinc-500 text-[10px] font-black uppercase tracking-wider mb-2">Left Thigh ({settings.lengthUnit})</Text>
-                <TextInput
+                <Text className="text-muted-foreground text-[10px] font-black uppercase tracking-wider mb-2">Left Thigh ({settings.lengthUnit})</Text>
+                <Input
                   value={leftThigh}
                   onChangeText={setLeftThigh}
                   keyboardType="numeric"
                   placeholder="e.g. 58"
-                  placeholderTextColor="#3f3f46"
-                  className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 text-zinc-900 dark:text-white px-3 py-2.5 rounded-xl font-bold text-xs focus:border-emerald-500"
                 />
               </View>
 
-              <View className="flex-1">
-                <Text className="text-zinc-500 text-[10px] font-black uppercase tracking-wider mb-2">Right Thigh ({settings.lengthUnit})</Text>
-                <TextInput
+              <View className="flex-grow flex-1">
+                <Text className="text-muted-foreground text-[10px] font-black uppercase tracking-wider mb-2">Right Thigh ({settings.lengthUnit})</Text>
+                <Input
                   value={rightThigh}
                   onChangeText={setRightThigh}
                   keyboardType="numeric"
                   placeholder="e.g. 58.2"
-                  placeholderTextColor="#3f3f46"
-                  className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 text-zinc-900 dark:text-white px-3 py-2.5 rounded-xl font-bold text-xs focus:border-emerald-500"
                 />
               </View>
             </View>
 
             {/* Photo Selection Grid */}
             <View>
-              <Text className="text-zinc-500 text-[10px] font-black uppercase tracking-wider mb-3">Physique Photos</Text>
+              <Text className="text-muted-foreground text-[10px] font-black uppercase tracking-wider mb-3">Physique Photos</Text>
               <View className="flex-row flex-wrap justify-between gap-y-3">
                 {(["front", "left", "right", "back"] as (keyof ProgressPhotos)[]).map((angle) => (
                   <Pressable
                     key={angle}
                     onPress={() => handlePickImage(angle)}
-                    className="w-[48%] h-[120px] bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/60 rounded-2xl justify-center items-center overflow-hidden"
+                    className="w-[48%] h-[120px] bg-background border border-border/60 rounded-2xl justify-center items-center overflow-hidden"
                   >
                     {photos[angle] ? (
                       <View className="w-full h-full">
                         <Image source={{ uri: photos[angle]! }} className="w-full h-full object-cover" />
                         <View className="absolute bottom-2 left-2 bg-black/60 px-2 py-0.5 rounded-md">
-                          <Text className="text-zinc-900 dark:text-white text-[8px] font-black uppercase tracking-wider">{angle}</Text>
+                          <Text className="text-white text-[8px] font-black uppercase tracking-wider">{angle}</Text>
                         </View>
                       </View>
                     ) : (
                       <View className="items-center">
-                        <Ionicons name="camera" size={20} color="#3f3f46" className="mb-1" />
-                        <Text className="text-zinc-500 text-[9px] font-bold uppercase tracking-wider">{angle} View</Text>
+                        <Ionicons name="camera" size={20} color={mutedIconColor} className="mb-1" />
+                        <Text className="text-muted-foreground text-[9px] font-bold uppercase tracking-wider">{angle} View</Text>
                       </View>
                     )}
                   </Pressable>
@@ -304,26 +299,25 @@ export default function Progress() {
 
             <Pressable
               onPress={handleSaveMeasurement}
-              className="bg-emerald-500 hover:bg-emerald-400 active:scale-95 py-3.5 rounded-2xl items-center shadow-lg shadow-emerald-500/10 mt-3"
+              className="bg-accent hover:bg-accent/90 active:scale-95 py-3.5 rounded-2xl items-center shadow-lg shadow-accent/10 mt-3"
             >
-              <Text className="text-zinc-950 font-black text-xs uppercase tracking-wider">Save Logs</Text>
+              <Text className="text-accent-foreground font-black text-xs uppercase tracking-wider">Save Logs</Text>
             </Pressable>
           </View>
         ) : null}
 
         {/* Chronological Timeline */}
         <View className="mb-12">
-          <Text className="text-zinc-500 text-xs font-semibold uppercase tracking-wider mb-4">Timeline Entries</Text>
+          <SectionHeader title="Timeline Entries" containerClassName="mb-4" />
           {measurements.length > 0 ? (
             <View className="gap-5">
               {measurements.map((item) => (
-                <View
+                <Card
                   key={item.id}
-                  className="bg-white dark:bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 rounded-3xl p-5"
                 >
                   {/* Top row date/delete */}
                   <View className="flex-row justify-between items-center mb-3">
-                    <Text className="text-zinc-900 dark:text-white text-sm font-black tracking-tight">
+                    <Text className="text-foreground text-sm font-black tracking-tight">
                       {new Date(item.measurementDate).toLocaleDateString(undefined, {
                         month: "short",
                         day: "numeric",
@@ -332,7 +326,7 @@ export default function Progress() {
                     </Text>
                     <Pressable
                       onPress={() => handleDeleteLog(item.id, item.measurementDate)}
-                      className="w-8 h-8 rounded-lg bg-zinc-50 dark:bg-zinc-950 justify-center items-center"
+                      className="w-8 h-8 rounded-lg bg-background justify-center items-center"
                     >
                       <Ionicons name="trash-outline" size={14} color="#ef4444" />
                     </Pressable>
@@ -341,51 +335,51 @@ export default function Progress() {
                   {/* Weight / Metrics Summary */}
                   <View className="flex-row flex-wrap gap-2.5 mb-4">
                     {item.bodyWeight ? (
-                      <View className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/60 px-3 py-1.5 rounded-xl">
-                        <Text className="text-zinc-500 text-[8px] font-bold uppercase tracking-wider mb-0.5">Weight</Text>
-                        <Text className="text-zinc-900 dark:text-white text-xs font-black">{item.bodyWeight} {settings.weightUnit}</Text>
+                      <View className="bg-background border border-border px-3 py-1.5 rounded-xl">
+                        <Text className="text-muted-foreground text-[8px] font-bold uppercase tracking-wider mb-0.5">Weight</Text>
+                        <Text className="text-foreground text-xs font-black">{item.bodyWeight} {settings.weightUnit}</Text>
                       </View>
                     ) : null}
 
                     {item.chestSize ? (
-                      <View className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/60 px-3 py-1.5 rounded-xl">
-                        <Text className="text-zinc-500 text-[8px] font-bold uppercase tracking-wider mb-0.5">Chest</Text>
-                        <Text className="text-zinc-900 dark:text-white text-xs font-black">{item.chestSize} {settings.lengthUnit}</Text>
+                      <View className="bg-background border border-border px-3 py-1.5 rounded-xl">
+                        <Text className="text-muted-foreground text-[8px] font-bold uppercase tracking-wider mb-0.5">Chest</Text>
+                        <Text className="text-foreground text-xs font-black">{item.chestSize} {settings.lengthUnit}</Text>
                       </View>
                     ) : null}
                     
                     {item.waistSize ? (
-                      <View className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/60 px-3 py-1.5 rounded-xl">
-                        <Text className="text-zinc-500 text-[8px] font-bold uppercase tracking-wider mb-0.5">Waist</Text>
-                        <Text className="text-zinc-900 dark:text-white text-xs font-black">{item.waistSize} {settings.lengthUnit}</Text>
+                      <View className="bg-background border border-border px-3 py-1.5 rounded-xl">
+                        <Text className="text-muted-foreground text-[8px] font-bold uppercase tracking-wider mb-0.5">Waist</Text>
+                        <Text className="text-foreground text-xs font-black">{item.waistSize} {settings.lengthUnit}</Text>
                       </View>
                     ) : null}
 
                     {item.leftArmSize ? (
-                      <View className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/60 px-3 py-1.5 rounded-xl">
-                        <Text className="text-zinc-500 text-[8px] font-bold uppercase tracking-wider mb-0.5">L Arm</Text>
-                        <Text className="text-zinc-900 dark:text-white text-xs font-black">{item.leftArmSize} {settings.lengthUnit}</Text>
+                      <View className="bg-background border border-border px-3 py-1.5 rounded-xl">
+                        <Text className="text-muted-foreground text-[8px] font-bold uppercase tracking-wider mb-0.5">L Arm</Text>
+                        <Text className="text-foreground text-xs font-black">{item.leftArmSize} {settings.lengthUnit}</Text>
                       </View>
                     ) : null}
 
                     {item.rightArmSize ? (
-                      <View className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/60 px-3 py-1.5 rounded-xl">
-                        <Text className="text-zinc-500 text-[8px] font-bold uppercase tracking-wider mb-0.5">R Arm</Text>
-                        <Text className="text-zinc-900 dark:text-white text-xs font-black">{item.rightArmSize} {settings.lengthUnit}</Text>
+                      <View className="bg-background border border-border px-3 py-1.5 rounded-xl">
+                        <Text className="text-muted-foreground text-[8px] font-bold uppercase tracking-wider mb-0.5">R Arm</Text>
+                        <Text className="text-foreground text-xs font-black">{item.rightArmSize} {settings.lengthUnit}</Text>
                       </View>
                     ) : null}
 
                     {item.leftThighSize ? (
-                      <View className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/60 px-3 py-1.5 rounded-xl">
-                        <Text className="text-zinc-500 text-[8px] font-bold uppercase tracking-wider mb-0.5">L Thigh</Text>
-                        <Text className="text-zinc-900 dark:text-white text-xs font-black">{item.leftThighSize} {settings.lengthUnit}</Text>
+                      <View className="bg-background border border-border px-3 py-1.5 rounded-xl">
+                        <Text className="text-muted-foreground text-[8px] font-bold uppercase tracking-wider mb-0.5">L Thigh</Text>
+                        <Text className="text-foreground text-xs font-black">{item.leftThighSize} {settings.lengthUnit}</Text>
                       </View>
                     ) : null}
 
                     {item.rightThighSize ? (
-                      <View className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/60 px-3 py-1.5 rounded-xl">
-                        <Text className="text-zinc-500 text-[8px] font-bold uppercase tracking-wider mb-0.5">R Thigh</Text>
-                        <Text className="text-zinc-900 dark:text-white text-xs font-black">{item.rightThighSize} {settings.lengthUnit}</Text>
+                      <View className="bg-background border border-border px-3 py-1.5 rounded-xl">
+                        <Text className="text-muted-foreground text-[8px] font-bold uppercase tracking-wider mb-0.5">R Thigh</Text>
+                        <Text className="text-foreground text-xs font-black">{item.rightThighSize} {settings.lengthUnit}</Text>
                       </View>
                     ) : null}
                   </View>
@@ -398,7 +392,7 @@ export default function Progress() {
                         return (
                           <View
                             key={angle}
-                            className="w-[60px] h-[80px] bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/60 rounded-xl overflow-hidden"
+                            className="w-[60px] h-[80px] bg-background border border-border rounded-xl overflow-hidden"
                           >
                             <Image source={{ uri: path }} className="w-full h-full object-cover" />
                           </View>
@@ -406,16 +400,17 @@ export default function Progress() {
                       })}
                     </View>
                   ) : null}
-                </View>
+                </Card>
               ))}
             </View>
           ) : (
-            <View className="bg-white dark:bg-zinc-900/10 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800/60 border-dashed rounded-3xl p-12 justify-center items-center">
-              <Ionicons name="scale-outline" size={36} color="#52525b" className="mb-2" />
-              <Text className="text-zinc-500 text-xs font-bold uppercase tracking-wider text-center">
-                No logs recorded.
-              </Text>
-            </View>
+            <EmptyState
+              iconName="scale-outline"
+              title="No logs recorded."
+              containerClassName="bg-card border border-border border-dashed rounded-3xl p-5 justify-center items-center"
+              titleClassName="text-muted-foreground text-xs font-bold uppercase tracking-wider text-center"
+              iconSize={36}
+            />
           )}
         </View>
 

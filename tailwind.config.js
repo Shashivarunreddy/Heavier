@@ -7,6 +7,17 @@ module.exports = {
   presets: [require("nativewind/preset")],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["Inter-Regular", "sans-serif"],
+        sora: ["Sora-Regular", "sans-serif"],
+        "sora-medium": ["Sora-Medium", "sans-serif"],
+        "sora-semibold": ["Sora-SemiBold", "sans-serif"],
+        "sora-bold": ["Sora-Bold", "sans-serif"],
+        inter: ["Inter-Regular", "sans-serif"],
+        "inter-medium": ["Inter-Medium", "sans-serif"],
+        "inter-semibold": ["Inter-SemiBold", "sans-serif"],
+        "inter-bold": ["Inter-Bold", "sans-serif"],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

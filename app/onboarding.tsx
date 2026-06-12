@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { View, Text, TextInput, Pressable, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, Pressable, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { useRouter, Href } from "expo-router";
 import { useUserStore } from "@/store/userStore";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Input from "../components/Input";
 
 export default function Onboarding() {
   const setOnboarded = useUserStore((state) => state.setOnboarded);
@@ -55,7 +56,7 @@ export default function Onboarding() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-zinc-50 dark:bg-zinc-950">
+    <SafeAreaView className="flex-1 bg-background">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
@@ -63,10 +64,10 @@ export default function Onboarding() {
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="px-6 py-8">
           <View className="flex-1 justify-center max-w-sm mx-auto w-full">
             <View className="mb-8">
-              <Text className="text-3xl font-black text-zinc-900 dark:text-white tracking-tight">
+              <Text className="text-3xl font-black text-foreground tracking-tight">
                 Profile Setup
               </Text>
-              <Text className="text-zinc-500 text-sm mt-1">
+              <Text className="text-muted-foreground text-sm mt-1">
                 Tell us about yourself to customize your experience.
               </Text>
             </View>
@@ -82,28 +83,26 @@ export default function Onboarding() {
             <View className="gap-5">
               {/* Name Input */}
               <View>
-                <Text className="text-zinc-600 dark:text-zinc-400 dark:text-zinc-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                <Text className="text-muted-foreground text-xs font-semibold uppercase tracking-wider mb-2">
                   Full Name
                 </Text>
-                <TextInput
+                <Input
                   value={name}
                   onChangeText={(val) => {
                     setName(val);
                     setError("");
                   }}
                   placeholder="e.g. John Doe"
-                  placeholderTextColor="#52525b"
-                  className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 text-zinc-900 dark:text-white px-4 py-3 rounded-xl focus:border-emerald-500 font-medium"
                 />
               </View>
 
               {/* Age & Gender Row */}
               <View className="flex-row gap-4">
                 <View className="flex-1">
-                  <Text className="text-zinc-600 dark:text-zinc-400 dark:text-zinc-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                  <Text className="text-muted-foreground text-xs font-semibold uppercase tracking-wider mb-2">
                     Age
                   </Text>
-                  <TextInput
+                  <Input
                     value={age}
                     onChangeText={(val) => {
                       setAge(val);
@@ -111,25 +110,23 @@ export default function Onboarding() {
                     }}
                     keyboardType="numeric"
                     placeholder="e.g. 25"
-                    placeholderTextColor="#52525b"
-                    className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 text-zinc-900 dark:text-white px-4 py-3 rounded-xl focus:border-emerald-500 font-medium"
                   />
                 </View>
 
                 <View className="flex-1">
-                  <Text className="text-zinc-600 dark:text-zinc-400 dark:text-zinc-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                  <Text className="text-muted-foreground text-xs font-semibold uppercase tracking-wider mb-2">
                     Gender
                   </Text>
-                  <View className="flex-row bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 rounded-xl overflow-hidden h-[48px]">
+                  <View className="flex-row bg-card border border-border rounded-xl overflow-hidden h-[48px]">
                     <Pressable
                       onPress={() => setGender("male")}
                       className={`flex-1 justify-center items-center ${
-                        gender === "male" ? "bg-emerald-500" : ""
+                        gender === "male" ? "bg-accent" : ""
                       }`}
                     >
                       <Text
                         className={`text-xs font-bold ${
-                          gender === "male" ? "text-zinc-950" : "text-zinc-600 dark:text-zinc-400 dark:text-zinc-400"
+                          gender === "male" ? "text-accent-foreground" : "text-muted-foreground"
                         }`}
                       >
                         Male
@@ -138,12 +135,12 @@ export default function Onboarding() {
                     <Pressable
                       onPress={() => setGender("female")}
                       className={`flex-1 justify-center items-center ${
-                        gender === "female" ? "bg-emerald-500" : ""
+                        gender === "female" ? "bg-accent" : ""
                       }`}
                     >
                       <Text
                         className={`text-xs font-bold ${
-                          gender === "female" ? "text-zinc-950" : "text-zinc-600 dark:text-zinc-400 dark:text-zinc-400"
+                          gender === "female" ? "text-accent-foreground" : "text-muted-foreground"
                         }`}
                       >
                         Female
@@ -156,10 +153,10 @@ export default function Onboarding() {
               {/* Height & Weight Row */}
               <View className="flex-row gap-4">
                 <View className="flex-1">
-                  <Text className="text-zinc-600 dark:text-zinc-400 dark:text-zinc-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                  <Text className="text-muted-foreground text-xs font-semibold uppercase tracking-wider mb-2">
                     Height (cm)
                   </Text>
-                  <TextInput
+                  <Input
                     value={height}
                     onChangeText={(val) => {
                       setHeight(val);
@@ -167,16 +164,14 @@ export default function Onboarding() {
                     }}
                     keyboardType="numeric"
                     placeholder="e.g. 175"
-                    placeholderTextColor="#52525b"
-                    className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 text-zinc-900 dark:text-white px-4 py-3 rounded-xl focus:border-emerald-500 font-medium"
                   />
                 </View>
 
                 <View className="flex-1">
-                  <Text className="text-zinc-600 dark:text-zinc-400 dark:text-zinc-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                  <Text className="text-muted-foreground text-xs font-semibold uppercase tracking-wider mb-2">
                     Weight (kg)
                   </Text>
-                  <TextInput
+                  <Input
                     value={weight}
                     onChangeText={(val) => {
                       setWeight(val);
@@ -184,8 +179,6 @@ export default function Onboarding() {
                     }}
                     keyboardType="numeric"
                     placeholder="e.g. 70"
-                    placeholderTextColor="#52525b"
-                    className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 dark:border-zinc-800 text-zinc-900 dark:text-white px-4 py-3 rounded-xl focus:border-emerald-500 font-medium"
                   />
                 </View>
               </View>
@@ -193,9 +186,9 @@ export default function Onboarding() {
               {/* Submit Button */}
               <Pressable
                 onPress={handleOnboardingComplete}
-                className="bg-emerald-500 hover:bg-emerald-400 active:scale-95 px-6 py-4 rounded-xl items-center shadow-lg shadow-emerald-500/20 mt-4 transition-all"
+                className="bg-accent hover:bg-accent/90 active:scale-95 px-6 py-4 rounded-xl items-center shadow-lg shadow-accent/20 mt-4 transition-all"
               >
-                <Text className="text-zinc-950 font-bold text-base">
+                <Text className="text-accent-foreground font-bold text-base">
                   Save & Continue
                 </Text>
               </Pressable>

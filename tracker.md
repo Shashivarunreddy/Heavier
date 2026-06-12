@@ -23,6 +23,7 @@ This file tracks the design and coding progress for the Heavier gym progress tra
 | **Analytics Charts Dashboard** | **100% Complete** | Weight timelines, workout frequencies, strength progressions, and all PRs listings in `app/(tabs)/analytics.tsx`. |
 | **System Settings** | **100% Complete** | Theme selectors, unit preferences, rest defaults, and local DB info. |
 | **Custom Exercise Library** | **100% Complete** | SQLite database storage, Zustand store state management, and inline creation modals across active workouts, template creator, and library explorer. |
+| **Google Fonts Integration** | **100% Complete** | Custom Sora and Inter font assets loaded in `app/_layout.tsx` and mapped system-wide to Tailwind/Nativewind weight classes and default element styles. |
 
 
 ---

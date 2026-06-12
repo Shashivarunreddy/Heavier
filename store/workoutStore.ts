@@ -119,7 +119,7 @@ interface WorkoutState {
   removeExerciseFromActiveWorkout: (exerciseIndex: number) => void;
   addSetToActiveExercise: (exerciseIndex: number) => void;
   removeSetFromActiveExercise: (exerciseIndex: number, setIndex: number) => void;
-  finishActiveWorkout: (notes: string) => Promise<WorkoutHistoryEntry | null>;
+  finishActiveWorkout: (notes?: string) => Promise<WorkoutHistoryEntry | null>;
   cancelActiveWorkout: () => void;
 
   loadWorkoutHistory: () => Promise<void>;
@@ -377,7 +377,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
     });
   },
 
-  finishActiveWorkout: async (notes: string) => {
+  finishActiveWorkout: async (notes: string = "") => {
     const active = get().activeWorkout;
     if (!active) return null;
 
@@ -403,15 +403,28 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
         workoutId = Number(result.lastInsertRowId);
 
         for (const ex of active.exercises) {
+          const exerciseName = ex.exerciseName || "Unknown Exercise";
           for (const s of ex.sets) {
+            const setNumber = s.setNumber || 1;
+            const reps = (s.reps === null || s.reps === undefined || isNaN(s.reps)) ? 0 : s.reps;
+            const weight = (s.weight === null || s.weight === undefined || isNaN(s.weight)) ? 0 : s.weight;
+
+            console.log("[Database Insert] Saving exercise set:", {
+              workoutId,
+              exerciseName,
+              setNumber,
+              reps,
+              weight,
+            });
+
             sqliteDb.runSync(
               `INSERT INTO exercises (workout_id, exercise_name, set_number, reps, weight, is_completed)
               VALUES (?, ?, ?, ?, ?, ?)`,
               workoutId,
-              ex.exerciseName,
-              s.setNumber,
-              s.reps,
-              s.weight,
+              exerciseName,
+              setNumber,
+              reps,
+              weight,
               s.isCompleted ? 1 : 0
             );
           }
