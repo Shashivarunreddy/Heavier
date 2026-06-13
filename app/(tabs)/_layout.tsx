@@ -2,9 +2,11 @@ import { Tabs } from "expo-router";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Ionicons } from "@expo/vector-icons";
 import { NAV_THEME } from "@/lib/theme";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabsLayout() {
   const { isDarkColorScheme } = useColorScheme();
+  const insets = useSafeAreaInsets();
 
   const themeColors = isDarkColorScheme ? NAV_THEME.dark : NAV_THEME.light;
 
@@ -18,9 +20,9 @@ export default function TabsLayout() {
           backgroundColor: themeColors.background,
           borderTopColor: themeColors.border,
           borderTopWidth: 1,
-          height: 60,
-          paddingBottom: 8,
-          paddingTop: 8,
+          height: 64 + Math.max(insets.bottom, 12),
+          paddingBottom: Math.max(insets.bottom, 12),
+          paddingTop: 12,
         },
         tabBarLabelStyle: {
           fontSize: 11,

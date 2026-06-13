@@ -13,6 +13,7 @@ import { View, ActivityIndicator } from "react-native";
 import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
 
 // Suppress Reanimated warnings about reading values during component render
 configureReanimatedLogger({
@@ -84,8 +85,11 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-      <Stack screenOptions={{ headerShown: false }} />
-      <PortalHost />
+      <View className={isDarkColorScheme ? "dark flex-1" : "flex-1"}>
+        <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
+        <Stack screenOptions={{ headerShown: false }} />
+        <PortalHost />
+      </View>
     </ThemeProvider>
   );
 }
